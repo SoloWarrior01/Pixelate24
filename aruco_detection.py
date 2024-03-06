@@ -28,6 +28,8 @@ def aruco_location(image):
     if (ids is not None) and (corners is not None):
         # variable_translation = corners
         for (markerCorner, markerID) in zip(corners, ids):
+            if markerID!=2:
+                continue
             corners = markerCorner.reshape((4, 2))
             (topLeft, topRight, bottomRight, bottomLeft) = corners
             
@@ -52,17 +54,15 @@ def aruco_location(image):
                 0.5, (0, 255, 0), 2)
             print("[INFO] ArUco marker ID: {}".format(markerID))
             
-            cv2.imshow("image", image)
-            cv2.waitKey(1)
-        current_point = (
+            current_point = (
             (corners[0][0] + corners[2][0]) / 2, (corners[0][1] + corners[2][1]) / 2)
             
         
-        dir = math.atan2((corners[0][1] - corners[3][1]),
+            dir = math.atan2((corners[0][1] - corners[3][1]),
                                    (corners[0][0] - corners[3][0]))
-    # print(current_point)
-    # print(dir)
-        send_pose(current_point,dir)
+            send_pose(current_point,dir)
+    cv2.imshow("image", image)
+    cv2.waitKey(1)
 
 if __name__ == "__main__":
     rospy.init_node('cam')

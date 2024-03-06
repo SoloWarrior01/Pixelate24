@@ -9,7 +9,7 @@ def nothing(x):
     pass
 
 rospy.init_node("trackbar_speed")
-vel_pub = rospy.Publisher('omni_vel', Twist, queue_size=10)
+vel_pub = rospy.Publisher('pid_rot', Twist, queue_size=10)
 vel = Twist()
 # Create a black image, a window
 img = np.zeros((300,512,3), np.uint8)
@@ -19,12 +19,10 @@ cv2.namedWindow('image')
 
 # create trackbars for color change
 
-cv2.createTrackbar('LEFT','image',0,30,nothing)
-
-cv2.createTrackbar('RIGHT','image',0,30,nothing)
-
-cv2.setTrackbarMin('LEFT', 'image', -3)
-cv2.setTrackbarMin('RIGHT', 'image', -3)
+cv2.createTrackbar('P_rot','image',0,30,nothing)
+cv2.createTrackbar('I_rot','image',0,3,nothing)
+cv2.createTrackbar('D_rot','image',0,30,nothing)
+# cv2.createTrackbar('scale','image',0,200,nothing)
 
 
 
@@ -32,11 +30,11 @@ cv2.setTrackbarMin('RIGHT', 'image', -3)
 
 switch = '0 : OFF \n1 : ON'
 
-cv2.createTrackbar(switch, 'image',0,1,nothing)
+cv2.createTrackbar(switch, 'image',1,1,nothing)
 
 
 
-while(1):
+while not rospy.is_shutdown():
 
     cv2.imshow('image',img)
 
@@ -53,9 +51,11 @@ while(1):
 
     # get current positions of four trackbars
 
-    r = cv2.getTrackbarPos('LEFT','image')
+    p_rot = cv2.getTrackbarPos('P_rot','image')
 
-    g = cv2.getTrackbarPos('RIGHT','image')
+    i_rot = cv2.getTrackbarPos('I_rot','image')
+
+    d_rot = cv2.getTrackbarPos('D_rot','image')
 
     s = cv2.getTrackbarPos(switch,'image')
 
@@ -70,9 +70,9 @@ while(1):
         
 
     else:
-        vel.linear.x=r/10
-        vel.linear.y=g/10
-        vel.linear.z=0
+        vel.linear.x=p_rot/10
+        vel.linear.y=i_rot
+        vel.linear.z=d_rot/10
 
     vel_pub.publish(vel)
 
