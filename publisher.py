@@ -40,14 +40,14 @@ def send_vel(pub_vel,left,right):
 
 def move_straight_1(final_point):
     lin_tolerance=15
-    rot_tolerance=0.08
-    lin_vel=1.7
+    rot_tolerance=0.15
+    lin_vel=1.6
     P_lin=1.2
     I_lin=0
     D_lin=0.1
     P_rot=1.2
     I_rot=0
-    D_rot=0.1
+    D_rot=0.4
     prev_rot=0
     ITerm_rot = 0
     max_rot = 0.2
@@ -84,7 +84,7 @@ def move_straight_1(final_point):
 
         if math.fabs(err_rot) < rot_tolerance:
             stopper+=1
-            if stopper==3:
+            if stopper==5:
                 send_vel(pub_vel,0,0)
                 break
         else:
@@ -121,15 +121,15 @@ def move_straight_2(final_point):
     P_lin=1.2
     I_lin=0
     D_lin=0.1
-    P_rot=1.2
-    I_rot=0
-    D_rot=0.1
+    P_rot=1.5
+    I_rot=1
+    D_rot=0.3
     prev_rot=0
     ITerm_rot = 0
     max_rot = 0.3
     IMAX_rot= 0.20
     IMIN_rot= -0.20
-    rot_scale = 1
+    rot_scale = 15
     prev_time = rospy.get_time()
     stopper=0
 
@@ -174,7 +174,7 @@ def move_straight_2(final_point):
 def rotate_to_final_location(final_point):
     rot_vel = 1.5
     rot_tolerance = 0.15
-    final_point = (266,191)
+    final_point = (255,268)
     stopper=0
     # while not rospy.is_shutdown():
     while False:
