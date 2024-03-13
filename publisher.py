@@ -2,6 +2,7 @@
 
 import rospy
 from std_msgs.msg import String
+from std_msgs.msg import UInt8
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import Pose
 import math
@@ -115,7 +116,7 @@ def move_straight_1(final_point):
     print("yayayay")
  
 def move_straight_2(final_point):
-    lin_tolerance=15
+    lin_tolerance=10
     rot_tolerance=0.08
     lin_vel=2.0
     P_lin=1.2
@@ -172,46 +173,18 @@ def move_straight_2(final_point):
 
 
 def rotate_to_final_location(final_point):
-    rot_vel = 1.5
-    rot_tolerance = 0.15
-    final_point = (255,268)
-    stopper=0
-    # while not rospy.is_shutdown():
-    while False:
-        target_dir = math.atan2((final_point[1] - curr[1]), (final_point[0] - curr[0]))
-        print(target_dir - dir)
-        if math.fabs(dir - target_dir) < rot_tolerance:
-            send_vel(pub_vel,0,0)
-            stopper+=1
-            if stopper==40:
-                break
-        else:       
-                    stopper=0
-            # if target_dir * dir > 0:
-            #     print(target_dir - dir,"first")
-            #     send_vel(pub_vel,2.0,-2.0)
-            # else:
-            #     if dir < 0:
-                    # print(target_dir - dir,"second")
-                    if 0 <= target_dir - dir <= math.pi:
-                        send_vel(pub_vel,rot_vel,-rot_vel)
-                    else:
-                        send_vel(pub_vel,-rot_vel,rot_vel)
-                # else:
-                #     print(target_dir - dir,"third")
-                #     if 0 >= target_dir - dir >= -math.pi:
-                #         send_vel(pub_vel,-rot_vel,rot_vel)
-                #     else:
-                #         send_vel(pub_vel,rot_vel,-rot_vel)
-        rate.sleep()
+
     move_straight_1(final_point)
     move_straight_2(final_point)
-
+    msg = UInt8()
+    msg.data=1
+    finished_pub.publish(msg)
 
 if __name__ == "__main__":
     rospy.init_node('vel', anonymous=True)
     rate = rospy.Rate(20)
     pub_vel = rospy.Publisher('omni_vel', Twist, queue_size=1)
+    finished_pub = rospy.Publisher('finished',UInt8,queue_size=1,latch=True)
     rospy.Subscriber('/pose',Pose,pos_cb,queue_size=1)
     rospy.Subscriber('/rotate',Pose,rot_cb,queue_size=1)
     rospy.Subscriber('/pid_rot',Twist,pid_rot_cb,queue_size=1)
